@@ -1,13 +1,15 @@
 project(dolphin-owncloud)
 
-cmake_minimum_required(VERSION 2.8.12)
+cmake_minimum_required(VERSION 3.16)
+
 include(FeatureSummary)
-set(QT_MIN_VERSION "5.3.0")
-set(KF5_MIN_VERSION "5.16.0")
+
+set(QT_MIN_VERSION "5.9.7")
+set(KF5_MIN_VERSION "5.52.0")
 
 find_package(Qt5 ${QT_MIN_VERSION} CONFIG REQUIRED COMPONENTS Core Network)
 
-find_package(ECM 1.2.0 REQUIRED CONFIG)
+find_package(ECM ${KF5_MIN_VERSION} REQUIRED CONFIG)
 set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 find_package(KF5 ${KF5_MIN_VERSION} REQUIRED COMPONENTS CoreAddons KIO)
