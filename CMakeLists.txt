@@ -32,8 +32,8 @@ include(KDECompilerSettings)
 include(ECMMarkNonGuiExecutable)
 include(GenerateExportHeader)
 
-if (NOT DEFINED APPLICATION_EXECUTABLE )
-  set ( APPLICATION_EXECUTABLE  "owncloud" )
+if(NOT DEFINED APPLICATION_EXECUTABLE)
+  set(APPLICATION_EXECUTABLE "owncloud")
 endif()
 
 add_subdirectory(src)
