@@ -32,8 +32,8 @@ include(KDECompilerSettings)
 include(ECMMarkNonGuiExecutable)
 include(GenerateExportHeader)
 
-if(NOT DEFINED APPLICATION_EXECUTABLE)
-  set(APPLICATION_EXECUTABLE "owncloud")
-endif()
+set(APPLICATION_NAME       "ownCloud" CACHE STRING "Branding parameter")
+set(APPLICATION_SHORTNAME  "ownCloud" CACHE STRING "Branding parameter")
+set(APPLICATION_EXECUTABLE "owncloud" CACHE STRING "Branding parameter")
 
 add_subdirectory(src)
