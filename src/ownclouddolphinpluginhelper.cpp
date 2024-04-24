@@ -120,11 +120,9 @@ void OwncloudDolphinPluginHelper::slotReadyRead()
             _paths.append(file);
             continue;
         } else if (command == QByteArrayLiteral("STRING")) {
-            auto args = info.split(':');
+            auto args = QString::fromUtf8(info).split(QLatin1Char(':'));
             if (args.size() >= 2) {
-                QString str = QString::fromUtf8(info);
-                str.remove(0, QString::fromUtf8(args[0]).length()+1);
-                _strings.insert(args[0], str);
+                _strings[args[0].toUtf8()] = args.mid(1).join(QLatin1Char(':'));
             }
             continue;
         } else if (command == QByteArrayLiteral("VERSION")) {
