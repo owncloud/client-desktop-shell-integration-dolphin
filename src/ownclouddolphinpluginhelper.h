@@ -16,9 +16,7 @@
  *   Free Software Foundation, Inc.,                                          *
  *   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA               *
  ******************************************************************************/
-
-#ifndef OWNCLOUDDOLPHINPLUGINHELPER_H
-#define OWNCLOUDDOLPHINPLUGINHELPER_H
+#pragma once
 
 #include <QObject>
 #include <QBasicTimer>
@@ -77,5 +75,3 @@ private:
     QPixmap _clientIcon;
     int _msgId = 1;
 };
-
-#endif
