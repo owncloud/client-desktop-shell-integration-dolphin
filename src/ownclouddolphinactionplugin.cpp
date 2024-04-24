@@ -41,11 +41,6 @@ OwncloudDolphinPluginAction::OwncloudDolphinPluginAction(QObject* parent, const 
 
 }
 
-OwncloudDolphinPluginAction::~OwncloudDolphinPluginAction()
-{
-
-}
-
 QList<QAction*> OwncloudDolphinPluginAction::actions(const KFileItemListProperties& fileItemInfos, QWidget* parentWidget)
 {
     auto helper = OwncloudDolphinPluginHelper::instance();
@@ -72,8 +67,6 @@ QList<QAction*> OwncloudDolphinPluginAction::actions(const KFileItemListProperti
     if (helper->version() < "1.1") { // in this case, lexicographic order works
         return legacyActions(fileItemInfos, parentWidget);
     }
-
-    qDebug() << "XXXXXXXXXXXXXXXXXXXXXX";
 
     auto menu = new QMenu(parentWidget);
     QEventLoop loop;

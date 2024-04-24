@@ -10,4 +10,5 @@
             "KFileItemAction/Plugin"
         ]
     },
+    "MimeType": "application/octet-stream;"
 }

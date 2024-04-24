@@ -13,7 +13,7 @@ class OwncloudDolphinPluginAction : public KAbstractFileItemActionPlugin
     Q_OBJECT
 public:
     explicit OwncloudDolphinPluginAction(QObject *parent, const QVariantList &args);
-    ~OwncloudDolphinPluginAction() override;
+
     QList<QAction *> actions(const KFileItemListProperties &fileItemInfos, QWidget *parentWidget) override;
 
 private:
