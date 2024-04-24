@@ -36,7 +36,7 @@ OwncloudDolphinPluginHelper* OwncloudDolphinPluginHelper::instance()
 
 OwncloudDolphinPluginHelper::OwncloudDolphinPluginHelper()
 {
-    connect(&_socket, &QLocalSocket::connected, this, &OwncloudDolphinPluginHelper::slotConnected);
+    QObject::connect(&_socket, &QLocalSocket::connected, this, &OwncloudDolphinPluginHelper::slotConnected);
     connect(&_socket, &QLocalSocket::readyRead, this, &OwncloudDolphinPluginHelper::slotReadyRead);
     _connectTimer.start(45 * 1000, Qt::VeryCoarseTimer, this);
     tryConnect();
@@ -56,7 +56,7 @@ bool OwncloudDolphinPluginHelper::isConnected() const
     return _socket.state() == QLocalSocket::ConnectedState;
 }
 
-void OwncloudDolphinPluginHelper::sendCommand(const char* data)
+void OwncloudDolphinPluginHelper::sendCommand(const QByteArray& data)
 {
     _socket.write(data);
     _socket.flush();
@@ -64,12 +64,13 @@ void OwncloudDolphinPluginHelper::sendCommand(const char* data)
 
 void OwncloudDolphinPluginHelper::sendGetClientIconCommand(int size)
 {
-    const QByteArray cmd = QByteArrayLiteral("V2/GET_CLIENT_ICON:");
-    const QByteArray newLine = QByteArrayLiteral("\n");
+    const QByteArray cmd{"V2/GET_CLIENT_ICON:"};
+    const QByteArray newLine{"\n"};
     const QJsonObject args { { QStringLiteral("size"), size } };
     const QJsonObject obj { { QStringLiteral("id"), QString::number(_msgId++) }, { QStringLiteral("arguments"), args } };
     const auto json = QJsonDocument(obj).toJson(QJsonDocument::Compact);
-    sendCommand(QByteArray(cmd + json + newLine));
+
+    sendCommand(cmd + json + newLine);
 }
 
 void OwncloudDolphinPluginHelper::slotConnected()
@@ -85,7 +86,7 @@ void OwncloudDolphinPluginHelper::tryConnect()
     }
 
     QString socketPath = QStandardPaths::locate(QStandardPaths::RuntimeLocation,
-                                                APPLICATION_SHORTNAME,
+                                                QStringLiteral(APPLICATION_SHORTNAME),
                                                 QStandardPaths::LocateDirectory);
     if(socketPath.isEmpty())
         return;
@@ -119,9 +120,11 @@ void OwncloudDolphinPluginHelper::slotReadyRead()
             _paths.append(file);
             continue;
         } else if (command == QByteArrayLiteral("STRING")) {
-            auto args = QString::fromUtf8(info).split(':');
+            auto args = info.split(':');
             if (args.size() >= 2) {
-                _strings[args[0]] = args.mid(1).join(':');
+                QString str = QString::fromUtf8(info);
+                str.remove(0, QString::fromUtf8(args[0]).length()+1);
+                _strings.insert(args[0], str);
             }
             continue;
         } else if (command == QByteArrayLiteral("VERSION")) {
@@ -144,14 +147,14 @@ void OwncloudDolphinPluginHelper::slotReadyRead()
                 continue;
             }
 
-            auto jsonArgs = json.value("arguments").toObject();
+            auto jsonArgs = json.value(QStringLiteral("arguments")).toObject();
             if (jsonArgs.isEmpty()) {
-                auto jsonErr = json.value("error").toObject();
+                auto jsonErr = json.value(QStringLiteral("error")).toObject();
                 qCWarning(lcPluginHelper) << "Error getting client icon: " << jsonErr;
                 continue;
             }
 
-            const QByteArray pngBase64 = jsonArgs.value("png").toString().toUtf8();
+            const QByteArray pngBase64 = jsonArgs.value(QStringLiteral("png")).toString().toUtf8();
             QByteArray png = QByteArray::fromBase64(pngBase64);
 
             QPixmap pixmap;
@@ -161,6 +164,7 @@ void OwncloudDolphinPluginHelper::slotReadyRead()
             }
         }
 
-        emit commandRecieved(line);
+        Q_EMIT commandReceived(line);
     }
 }
+

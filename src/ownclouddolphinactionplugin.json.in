@@ -1,0 +1,13 @@
+{
+    "KPlugin": {
+        "MimeTypes": [
+            "application/octet-stream",
+            "inode/directory"
+        ],
+        "Name": "@APPLICATION_NAME@Action",
+        "Description": "ownCloud File Actions",
+        "ServiceTypes": [
+            "KFileItemAction/Plugin"
+        ]
+    },
+}

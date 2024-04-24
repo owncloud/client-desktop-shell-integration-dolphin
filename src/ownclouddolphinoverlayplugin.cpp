@@ -19,10 +19,11 @@
 
 #include <KOverlayIconPlugin>
 #include <KPluginFactory>
-#include <QtNetwork/QLocalSocket>
-#include <KIOCore/kfileitem.h>
+#include <QLocalSocket>
+#include <KFileItem>
 #include <QDir>
 #include <QTimer>
+
 #include "ownclouddolphinpluginhelper.h"
 
 class OwncloudDolphinPlugin : public KOverlayIconPlugin
@@ -37,8 +38,8 @@ public:
 
     OwncloudDolphinPlugin() {
         auto helper = OwncloudDolphinPluginHelper::instance();
-        QObject::connect(helper, &OwncloudDolphinPluginHelper::commandRecieved,
-                         this, &OwncloudDolphinPlugin::slotCommandRecieved);
+        QObject::connect(helper, &OwncloudDolphinPluginHelper::commandReceived,
+                         this, &OwncloudDolphinPlugin::slotCommandReceived);
     }
 
     QStringList getOverlays(const QUrl& url) override {
@@ -50,7 +51,7 @@ public:
         QDir localPath(url.toLocalFile());
         const QByteArray localFile = localPath.canonicalPath().toUtf8();
 
-        helper->sendCommand(QByteArray("RETRIEVE_FILE_STATUS:" + localFile + "\n"));
+        helper->sendCommand("RETRIEVE_FILE_STATUS:" + localFile + "\n");
 
         StatusMap::iterator it = m_status.find(localFile);
         if (it != m_status.constEnd()) {
@@ -66,21 +67,21 @@ private:
             return r;
 
         if (status.startsWith("OK"))
-            r << "vcs-normal";
+            r.append(QStringLiteral("vcs-normal"));
         if (status.startsWith("SYNC") || status.startsWith("NEW"))
-            r << "vcs-update-required";
+            r.append(QStringLiteral("vcs-update-required"));
         if (status.startsWith("IGNORE") || status.startsWith("WARN"))
-            r << "vcs-locally-modified-unstaged";
+            r.append(QStringLiteral("vcs-locally-modified-unstaged"));
         if (status.startsWith("ERROR"))
-            r << "vcs-conflicting";
+            r.append(QStringLiteral("vcs-conflicting"));
 
         if (status.contains("+SWM"))
-            r << "document-share";
+            r.append(QStringLiteral("document-share"));
 
         return r;
     }
 
-    void slotCommandRecieved(const QByteArray &line) {
+    void slotCommandReceived(const QByteArray &line) {
 
         QList<QByteArray> tokens = line.split(':');
         if (tokens.count() != 3)
@@ -96,7 +97,7 @@ private:
             return;
         status = tokens[1];
 
-        emit overlaysChanged(QUrl::fromLocalFile(QString::fromUtf8(name)), overlaysForString(status));
+        Q_EMIT overlaysChanged(QUrl::fromLocalFile(QString::fromUtf8(name)), overlaysForString(status));
     }
 };
 
