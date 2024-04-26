@@ -1,18 +1,26 @@
+cmake_minimum_required(VERSION 3.18)
 project(dolphin-owncloud)
 
-cmake_minimum_required(VERSION 3.16)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_AUTOMOC ON)
 
 include(FeatureSummary)
 
-set(QT_MIN_VERSION "5.9.7")
-set(KF5_MIN_VERSION "5.52.0")
+set(QT_MIN_VERSION 6.5.0)
+set(KF6_MIN_VERSION 6.1.0)
+set(ECM_MIN_VERSION 6.0.0)
 
-find_package(Qt5 ${QT_MIN_VERSION} CONFIG REQUIRED COMPONENTS Core Network)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-find_package(ECM ${KF5_MIN_VERSION} REQUIRED CONFIG)
-set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+find_package(QT ${QT_MIN_VERSION} NAMES Qt6 COMPONENTS Gui Core Network REQUIRED)
 
-find_package(KF5 ${KF5_MIN_VERSION} REQUIRED COMPONENTS CoreAddons KIO)
+message(STATUS "Using Qt ${QT_VERSION}")
+
+find_package(ECM ${ECM_MIN_VERSION} REQUIRED CONFIG)
+set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR} "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
+
+find_package(KF6 ${KF6_MIN_VERSION} REQUIRED COMPONENTS CoreAddons KIO Bookmarks)
 
 set_package_properties(DolphinVcs PROPERTIES
     DESCRIPTION "the Dolphin plugin library"
@@ -27,8 +35,10 @@ include(KDEInstallDirs)
 # when that is fixed and you want to remove this workaround,
 # you need to _require_ the new enough kcoreaddons
 set(PLUGIN_INSTALL_DIR "${KDE_INSTALL_PLUGINDIR}")
+include(ECMMarkNonGuiExecutable)
+include(ECMSetupVersion)
 include(KDECMakeSettings)
-include(KDECompilerSettings)
+include(KDECompilerSettings NO_POLICY_SCOPE)
 include(ECMMarkNonGuiExecutable)
 include(GenerateExportHeader)
 

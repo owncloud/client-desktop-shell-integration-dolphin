@@ -1,8 +1,13 @@
 {
     "KPlugin": {
+        "MimeTypes": [
+             "application/octet-stream",
+             "inode/directory"
+         ],
+        "Name": "ownCloud Actions",
         "Description": "Overlay icon for owncloud",
         "ServiceTypes": [
-            "KOverlayIconPlugin"
+            "KFileItemAction/Plugin"
         ]
     }
 }

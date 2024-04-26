@@ -1,21 +1,27 @@
 #---HELPER---
 set(OWNCLOUDDOLPHINHELPER ${APPLICATION_EXECUTABLE}dolphinpluginhelper)
-add_library(${OWNCLOUDDOLPHINHELPER} SHARED ownclouddolphinpluginhelper.cpp)
-target_link_libraries(${OWNCLOUDDOLPHINHELPER} Qt5::Network Qt5::Gui)
+add_library(${OWNCLOUDDOLPHINHELPER} SHARED ownclouddolphinpluginhelper.cpp ownclouddolphinpluginhelper.h)
 generate_export_header(${OWNCLOUDDOLPHINHELPER} BASE_NAME ownclouddolphinpluginhelper)
-install(TARGETS ${OWNCLOUDDOLPHINHELPER} LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+target_link_libraries(${OWNCLOUDDOLPHINHELPER} Qt6::Core Qt6::Network Qt6::Gui)
 target_compile_definitions(${OWNCLOUDDOLPHINHELPER} PRIVATE QT_USE_QSTRINGBUILDER APPLICATION_SHORTNAME="${APPLICATION_SHORTNAME}")
+
+install(TARGETS ${OWNCLOUDDOLPHINHELPER} LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 #---OVERLAY PLUGIN---
 set(OWNCLOUDDOLPHINOVERLAYPLUGIN ${APPLICATION_EXECUTABLE}dolphinoverlayplugin)
-kcoreaddons_add_plugin(${OWNCLOUDDOLPHINOVERLAYPLUGIN} INSTALL_NAMESPACE "kf5/overlayicon"
-                       JSON ownclouddolphinoverlayplugin.json SOURCES ownclouddolphinoverlayplugin.cpp)
-target_link_libraries(${OWNCLOUDDOLPHINOVERLAYPLUGIN} KF5::CoreAddons KF5::KIOCore KF5::KIOWidgets ${OWNCLOUDDOLPHINHELPER})
+kcoreaddons_add_plugin(${OWNCLOUDDOLPHINOVERLAYPLUGIN} INSTALL_NAMESPACE "kf6/overlayicon"
+                       SOURCES ownclouddolphinoverlayplugin.cpp)
+target_link_libraries(${OWNCLOUDDOLPHINOVERLAYPLUGIN} KF6::CoreAddons KF6::KIOCore KF6::KIOWidgets ${OWNCLOUDDOLPHINHELPER})
 
 #---ACTION PLUGIN---
 set(OWNCLOUDDOLPHINACTIONPLUGIN ${APPLICATION_EXECUTABLE}dolphinactionplugin)
-add_library(${OWNCLOUDDOLPHINACTIONPLUGIN} MODULE ownclouddolphinactionplugin.cpp)
-target_link_libraries(${OWNCLOUDDOLPHINACTIONPLUGIN} KF5::CoreAddons KF5::KIOCore KF5::KIOWidgets ${OWNCLOUDDOLPHINHELPER})
-configure_file(ownclouddolphinactionplugin.desktop.in ${OWNCLOUDDOLPHINACTIONPLUGIN}.desktop ESCAPE_QUOTES @ONLY)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${OWNCLOUDDOLPHINACTIONPLUGIN}.desktop DESTINATION ${KDE_INSTALL_KSERVICES5DIR})
+configure_file(ownclouddolphinactionplugin.json.in ${OWNCLOUDDOLPHINACTIONPLUGIN}.json ESCAPE_QUOTES @ONLY)
+kcoreaddons_add_plugin(${OWNCLOUDDOLPHINACTIONPLUGIN} SOURCES ownclouddolphinactionplugin.cpp INSTALL_NAMESPACE "kf6/kfileitemaction")
+
+target_sources(ownclouddolphinactionplugin
+  PRIVATE
+    ownclouddolphinactionplugin.h
+)
+target_link_libraries(${OWNCLOUDDOLPHINACTIONPLUGIN} KF6::CoreAddons KF6::KIOCore KF6::KIOWidgets ${OWNCLOUDDOLPHINHELPER})
+
 install(TARGETS ${OWNCLOUDDOLPHINACTIONPLUGIN} DESTINATION ${KDE_INSTALL_PLUGINDIR})

@@ -5,13 +5,13 @@ on: [push, pull_request, workflow_dispatch]
 jobs:
   build:
     name: Build plugins
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
+    container: opensuse/tumbleweed
     steps:
       - uses: actions/checkout@v2
       - name: Install dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends cmake ninja-build extra-cmake-modules qt5-qmake qtbase5-dev libsqlite3-dev libkf5kio-dev tree
+          zypper install -y cmake ninja "cmake(KF6KIO)" "cmake(Qt6Core)" tree
       - name: Build
         run: |
           mkdir build

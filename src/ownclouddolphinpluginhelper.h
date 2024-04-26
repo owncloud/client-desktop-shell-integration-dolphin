@@ -16,8 +16,8 @@
  *   Free Software Foundation, Inc.,                                          *
  *   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA               *
  ******************************************************************************/
-
 #pragma once
+
 #include <QObject>
 #include <QBasicTimer>
 #include <QLocalSocket>
@@ -31,18 +31,18 @@ public:
     static OwncloudDolphinPluginHelper *instance();
 
     bool isConnected() const;
-    void sendCommand(const char *data);
+    void sendCommand(const QByteArray&);
     void sendGetClientIconCommand(int size);
 
     QVector<QString> paths() const { return _paths; }
 
     QString contextMenuTitle() const
     {
-        return _strings.value("CONTEXT_MENU_TITLE", "ownCloud");
+        return _strings.value("CONTEXT_MENU_TITLE", QStringLiteral("ownCloud"));
     }
     QString shareActionTitle() const
     {
-        return _strings.value("SHARE_MENU_TITLE", "Share...");
+        return _strings.value("SHARE_MENU_TITLE", QStringLiteral("Share..."));
     }
     QPixmap clientIcon() const
     {
@@ -54,8 +54,8 @@ public:
 
     QByteArray version() { return _version; }
 
-signals:
-    void commandRecieved(const QByteArray &cmd);
+Q_SIGNALS:
+    void commandReceived(const QByteArray &cmd);
 
 protected:
     void timerEvent(QTimerEvent*) override;
@@ -70,7 +70,7 @@ private:
     QVector<QString> _paths;
     QBasicTimer _connectTimer;
 
-    QMap<QString, QString> _strings;
+    QMap<QByteArray, QString> _strings;
     QByteArray _version;
     QPixmap _clientIcon;
     int _msgId = 1;
