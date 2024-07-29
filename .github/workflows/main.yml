@@ -8,10 +8,27 @@ jobs:
     runs-on: ubuntu-latest
     container: opensuse/tumbleweed
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Checkout resources
+        uses: actions/checkout@v4
+        with:
+          repository: owncloud/client-desktop-shell-integration-resources
+          path: resources
+
       - name: Install dependencies
         run: |
           zypper install -y cmake ninja "cmake(KF6KIO)" "cmake(Qt6Core)" tree
+
+      - name: Install resources
+        run: |
+          mkdir resources/build
+          pushd resources/build
+          cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo -G Ninja
+          ninja install
+          popd
+
       - name: Build
         run: |
           mkdir build
