@@ -28,6 +28,8 @@
 #include <QDir>
 #include <QTimer>
 #include <QEventLoop>
+#include <QApplication>
+#include <QClipboard>
 
 #include "ownclouddolphinpluginhelper.h"
 #include "ownclouddolphinactionplugin.h"
@@ -81,6 +83,7 @@ QList<QAction*> OwncloudDolphinPluginAction::actions(const KFileItemListProperti
             if (args.value(2).contains(QLatin1Char('d')))
                 action->setDisabled(true);
             auto call = args.value(1).toLatin1();
+            action->setData(QString::fromLatin1(call));
             connect(action, &QAction::triggered, [helper, call, files] {
                 helper->sendCommand(QByteArray(call + ":" + files + "\n"));
             });
@@ -95,6 +98,29 @@ QList<QAction*> OwncloudDolphinPluginAction::actions(const KFileItemListProperti
 
     loop.exec(QEventLoop::ExcludeUserInputEvents);
     disconnect(con);
+
+    if (OwncloudDolphinPluginHelper::isWayland()) {
+        for (auto *act : menu->actions()) {
+            if (act->data().toString() == QLatin1String("COPY_PRIVATE_LINK")) {
+                disconnect(act, &QAction::triggered, nullptr, nullptr);
+                connect(act, &QAction::triggered, parentWidget, [helper, files] {
+                    QEventLoop waitLoop;
+                    QTimer::singleShot(1000, &waitLoop, &QEventLoop::quit);
+                    auto linkCon = connect(
+                        helper, &OwncloudDolphinPluginHelper::privateLinkReceived,
+                        &waitLoop, [&waitLoop](const QString &url) {
+                            QApplication::clipboard()->setText(url);
+                            waitLoop.quit();
+                        });
+                    helper->sendCommand(QByteArray("GET_PRIVATE_LINK:") + files.split('\x1e').first() + '\n');
+                    waitLoop.exec(QEventLoop::ExcludeUserInputEvents);
+                    disconnect(linkCon);
+                });
+                break;
+            }
+        }
+    }
+
     if (menu->actions().isEmpty()) {
         delete menu;
         return {};
