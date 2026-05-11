@@ -160,6 +160,9 @@ void OwncloudDolphinPluginHelper::slotReadyRead()
             if (isLoaded) {
                 _clientIcon = pixmap;
             }
+        } else if (command == QByteArrayLiteral("PRIVATE_LINK")) {
+            Q_EMIT privateLinkReceived(QString::fromUtf8(info));
+            continue;
         }
 
         Q_EMIT commandReceived(line);
