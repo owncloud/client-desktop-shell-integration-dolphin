@@ -54,8 +54,15 @@ public:
 
     QByteArray version() { return _version; }
 
+    static bool isWayland()
+    {
+        return !qEnvironmentVariableIsEmpty("WAYLAND_DISPLAY")
+            || qgetenv("XDG_SESSION_TYPE").toLower() == "wayland";
+    }
+
 Q_SIGNALS:
     void commandReceived(const QByteArray &cmd);
+    void privateLinkReceived(const QString &url);
 
 protected:
     void timerEvent(QTimerEvent*) override;
